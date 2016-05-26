@@ -1,0 +1,21 @@
+{
+  "name": "crud-todo-app",
+  "homepage": "https://github.com/josephkane/crud-todo-app",
+  "authors": [
+    "Joseph Kane <josephckane@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^2.2.4",
+    "bootstrap": "^3.3.6"
+  }
+}
