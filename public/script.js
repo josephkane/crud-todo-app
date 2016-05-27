@@ -1,5 +1,6 @@
 $(() => {
 	const API_URL = `https://crud-to-do-jk.firebaseio.com/task`;
+	let token;
 
 	function addDataToDOM (item, id) {
 		const row =
@@ -14,20 +15,22 @@ $(() => {
 		$('tbody').append(row);
 	}
 
-	$.get(`${API_URL}.json`)
-		.done((data) =>	{
-			if (data) {
-				Object.keys(data).forEach((id) => {
-					addDataToDOM(data[id], id)
-				})
-			}
-		});
+	const getTask = () => {
+		$.get(`${API_URL}.json?auth=${token}`)
+			.done((data) =>	{
+				if (data) {
+					Object.keys(data).forEach((id) => {
+						addDataToDOM(data[id], id)
+					})
+				}
+			});
+	}
 
 	$('.task').submit((e) => {
 		const newTask = $('.user-input').val();
 
 		if (newTask !== "") {
-			$.post(`${API_URL}.json`,
+			$.post(`${API_URL}.json?auth=${token}`,
 				JSON.stringify({ task: newTask })
 				).then((object) => (
 					addDataToDOM({task: newTask}, object.name)
@@ -45,7 +48,7 @@ $(() => {
 		const taskId = row.data('id');
 
 		$.ajax({
-			url: `${API_URL}/${taskId}.json`,
+			url: `${API_URL}/${taskId}.json?auth=${token}`,
 			method: 'DELETE'
 		}).done(() => {
 			row.remove();
@@ -53,6 +56,36 @@ $(() => {
 		)
 	});
 
+	const login = (email, password) => (
+		firebase.auth().signInWithEmailAndPassword(email, password)
+	)
+
+	const register = (user, password) => (
+		firebase.auth().createUserWithEmailAndPassword(user, password)
+	)
+
+	$('.login form').submit((e) => {
+		const email = $('.email').val();
+		const password = $('.password').val();
+
+		login(email, password)
+			.then(console.log)
+			.catch(console.error);
+
+		e.preventDefault();
+	});
+
+	$('input[value="Register"]').click((e) => {
+		const email = $('.email').val();
+		const password = $('.password').val();
+
+		register(email, password)
+			.then(() => login(email, password))
+			.then(console.log)
+			.catch(console.error);
+
+		e.preventDefault();
+	})
 
 	firebase.initializeApp({
 		apiKey: "AIzaSyD8SNCKdn8cYgzmCqDdzraIJTVsJIc6YgM",
@@ -60,5 +93,19 @@ $(() => {
 		databaseURL: "https://crud-to-do-jk.firebaseio.com",
 		storageBucket: "crud-to-do-jk.appspot.com",
 	});
+
+	firebase.auth().onAuthStateChanged((user) => {
+
+		if (user) {
+			$('.app').show();
+			user.getToken()
+				.then(t => token = t)
+				.then(getTask)
+		} else {
+			$('.login').show();
+		}
+
+	});
+
 
 })
