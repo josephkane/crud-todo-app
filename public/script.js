@@ -31,7 +31,18 @@ $(() => {
 		);
 	});
 
+	$('tbody').on('click', '.delete', (e) => {
+		const row = $(e.target).closest('tr');
+		const taskId = row.data('id');
 
+		$.ajax({
+			url: `${API_URL}/${taskId}.json`,
+			method: 'DELETE'
+		}).done(() => {
+			row.remove();
+			}
+		)
+	});
 
 
 	// firebase.initializeApp({
