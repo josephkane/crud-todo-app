@@ -1,8 +1,6 @@
 $(() => {
 	const API_URL = `https://crud-to-do-jk.firebaseio.com/task`;
 
-	let newTask;
-
 	function addDataToDOM (item, id) {
 		const row =
 		`<tr data-id="${id}">
@@ -17,19 +15,28 @@ $(() => {
 	}
 
 	$.get(`${API_URL}.json`)
-		.done((data) => (
-			Object.keys(data).forEach((id) => {
-				addDataToDOM(data[id], id)
-			})
-		));
+		.done((data) =>	{
+			if (data) {
+				console.log("data: ", data);
+				Object.keys(data).forEach((id) => {
+					console.log("id: ", id);
+					addDataToDOM(data[id], id)
+				})
+			}
+		});
 
 	$('form').submit((e) => {
-		newTask = $('.user-input').val();
+		const newTask = $('.user-input').val();
 
-		$.post(`${API_URL}.json`,
-			JSON.stringify({ task: newTask })
-		);
-	});
+		if (newTask !== "") {
+			$.post(`${API_URL}.json`,
+				JSON.stringify({ task: newTask })
+				);
+			} else {
+				alert('Please enter a task.');
+				e.preventDefault();
+			};
+		});
 
 	$('tbody').on('click', '.delete', (e) => {
 		const row = $(e.target).closest('tr');
