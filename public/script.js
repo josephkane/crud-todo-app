@@ -17,26 +17,28 @@ $(() => {
 	$.get(`${API_URL}.json`)
 		.done((data) =>	{
 			if (data) {
-				console.log("data: ", data);
 				Object.keys(data).forEach((id) => {
-					console.log("id: ", id);
 					addDataToDOM(data[id], id)
 				})
 			}
 		});
 
-	$('form').submit((e) => {
+	$('.task').submit((e) => {
 		const newTask = $('.user-input').val();
 
 		if (newTask !== "") {
 			$.post(`${API_URL}.json`,
 				JSON.stringify({ task: newTask })
-				);
+				).then((object) => (
+					addDataToDOM({task: newTask}, object.name)
+					))
+				.then(newTask = "");
+			e.preventDefault();
 			} else {
 				alert('Please enter a task.');
 				e.preventDefault();
-			};
-		});
+		};
+	});
 
 	$('tbody').on('click', '.delete', (e) => {
 		const row = $(e.target).closest('tr');
@@ -52,11 +54,11 @@ $(() => {
 	});
 
 
-	// firebase.initializeApp({
-	// 	apiKey: "AIzaSyD8SNCKdn8cYgzmCqDdzraIJTVsJIc6YgM",
-	// 	authDomain: "crud-to-do-jk.firebaseapp.com",
-	// 	databaseURL: "https://crud-to-do-jk.firebaseio.com",
-	// 	storageBucket: "crud-to-do-jk.appspot.com",
-	// });
+	firebase.initializeApp({
+		apiKey: "AIzaSyD8SNCKdn8cYgzmCqDdzraIJTVsJIc6YgM",
+		authDomain: "crud-to-do-jk.firebaseapp.com",
+		databaseURL: "https://crud-to-do-jk.firebaseio.com",
+		storageBucket: "crud-to-do-jk.appspot.com",
+	});
 
 })
