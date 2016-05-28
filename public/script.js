@@ -1,6 +1,7 @@
 $(() => {
-	const API_URL = `https://crud-to-do-jk.firebaseio.com/task`;
+	const API_URL = `https://crud-to-do-jk.firebaseio.com/`;
 	let token;
+	let userId;
 
 	function addDataToDOM (item, id) {
 		const row =
@@ -16,7 +17,7 @@ $(() => {
 	}
 
 	const getTask = () => {
-		$.get(`${API_URL}.json?auth=${token}`)
+		$.get(`${API_URL}/${userId}/task.json?auth=${token}`)
 			.done((data) =>	{
 				if (data) {
 					Object.keys(data).forEach((id) => {
@@ -29,18 +30,14 @@ $(() => {
 	$('.task').submit((e) => {
 		const newTask = $('.user-input').val();
 
-		if (newTask !== "") {
-			$.post(`${API_URL}.json?auth=${token}`,
-				JSON.stringify({ task: newTask })
-				).then((object) => (
-					addDataToDOM({task: newTask}, object.name)
-					))
-				.then(newTask = "");
-			e.preventDefault();
-			} else {
-				alert('Please enter a task.');
-				e.preventDefault();
-		};
+		$.post(`${API_URL}/${userId}/task.json?auth=${token}`,
+			JSON.stringify({ task: newTask })
+			).then((object) => (
+				addDataToDOM({task: newTask}, object.name)
+				))
+			.then(newTask = "");
+
+		e.preventDefault();
 	});
 
 	$('tbody').on('click', '.delete', (e) => {
@@ -48,7 +45,7 @@ $(() => {
 		const taskId = row.data('id');
 
 		$.ajax({
-			url: `${API_URL}/${taskId}.json?auth=${token}`,
+			url: `${API_URL}/${userId}/task/${taskId}.json?auth=${token}`,
 			method: 'DELETE'
 		}).done(() => {
 			row.remove();
@@ -97,15 +94,18 @@ $(() => {
 	firebase.auth().onAuthStateChanged((user) => {
 
 		if (user) {
+			$('.login').hide();
 			$('.app').show();
+			userId = user.uid;
 			user.getToken()
 				.then(t => token = t)
-				.then(getTask)
+				.then(getTask);
+
+
 		} else {
 			$('.login').show();
 		}
 
 	});
-
 
 })
