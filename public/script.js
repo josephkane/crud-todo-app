@@ -16,6 +16,7 @@ $(() => {
 		$('tbody').append(row);
 	}
 
+	// GET (GET)
 	const getTask = () => {
 		$.get(`${API_URL}/${userId}/task.json?auth=${token}`)
 			.done((data) =>	{
@@ -27,19 +28,21 @@ $(() => {
 			});
 	}
 
+	// CREATE (POST)
 	$('.task').submit((e) => {
-		const newTask = $('.user-input').val();
+		let newTask = $('.user-input').val();
 
 		$.post(`${API_URL}/${userId}/task.json?auth=${token}`,
 			JSON.stringify({ task: newTask })
-			).then((object) => (
-				addDataToDOM({task: newTask}, object.name)
-				))
-			.then(newTask = "");
+			).then((object) => {
+				addDataToDOM({task: newTask}, object.name);
+				$('.user-input').val('');
+			})
 
 		e.preventDefault();
 	});
 
+	// DELETE (DELETE)
 	$('tbody').on('click', '.delete', (e) => {
 		const row = $(e.target).closest('tr');
 		const taskId = row.data('id');
@@ -100,8 +103,6 @@ $(() => {
 			user.getToken()
 				.then(t => token = t)
 				.then(getTask);
-
-
 		} else {
 			$('.login').show();
 		}
