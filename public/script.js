@@ -64,6 +64,13 @@ $(() => {
 		firebase.auth().createUserWithEmailAndPassword(user, password)
 	)
 
+	$('.logout-button').click(() => {
+		firebase.auth().signOut();
+		$('.app').hide()
+		$('.login').show()
+	})
+
+
 	$('.login form').submit((e) => {
 		const email = $('.email').val();
 		const password = $('.password').val();
@@ -99,6 +106,7 @@ $(() => {
 		if (user) {
 			$('.login').hide();
 			$('.app').show();
+			$('.user-email').text(user.email)
 			userId = user.uid;
 			user.getToken()
 				.then(t => token = t)
